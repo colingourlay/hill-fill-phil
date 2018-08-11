@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hill Fill Phil</title>
+  <style>
+    body,
+    html {
+      background: black;
+      margin: 0;
+      padding: 0;
+      cursor: none;
+    }
+
+    body {
+      -webkit-app-region: drag;
+    }
+
+    #game canvas {
+      margin: auto;
+      cursor: none;
+    }
+
+    #picker {
+      position: fixed;
+      top: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="game"></div>
+  <input id="picker" type="file" directory webkitdirectory />
+
+  <script>
+    window.PIXI = require('phaser-ce/build/custom/pixi');
+    window.p2 = require('phaser-ce/build/custom/p2');
+    window.Phaser = require('phaser-ce/build/custom/phaser-split');
+
+    require('./game/index.js');
+  </script>
+</body>
+
+</html>

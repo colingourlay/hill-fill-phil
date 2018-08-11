@@ -1,0 +1,59 @@
+{
+  "name": "hill-fill-phil",
+  "productName": "Hill Fill Phil",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Get Phil up the hill, by filling your hard drive",
+  "author": "Colin Gourlay <colin@colin-gourlay.com>",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "electron-builder install-app-deps",
+    "pack": "electron-builder --dir",
+    "dist": "DIST=1 electron-builder"
+  },
+  "engines": {
+    "node": "8.9.1",
+    "npm": "5.5.1"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "get-folder-size": "^2.0.0",
+    "human-format": "^0.10.0",
+    "immutable": "^3.8.2",
+    "node-icns": "0.0.4",
+    "phaser-ce": "^2.9.2"
+  },
+  "devDependencies": {
+    "electron": "^1.7.9",
+    "electron-builder": "^19.47.1"
+  },
+  "build": {
+    "appId": "net.colingourlay.hillfillphil",
+    "mac": {
+      "category": "public.app-category.arcade-games"
+    },
+    "dmg": {
+      "iconSize": 128,
+      "title": "Hill Fill Phil"
+    },
+    "linux": {
+      "target": {
+        "target": "deb",
+        "arch": [
+          "x64",
+          "ia32"
+        ]
+      },
+      "category": "Game",
+      "desktop": {
+        "name": "Hill Fill Phil",
+        "terminal": false,
+        "categories": "Games"
+      }
+    },
+    "deb": {
+      "compression": "gz"
+    }
+  }
+}
