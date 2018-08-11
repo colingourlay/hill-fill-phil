@@ -1,3 +1,6 @@
+const { unit } = require('../../constants');
+const { font } = require('../../utils');
+
 class MenuState {
   create() {
     const { UP, DOWN, ENTER, SPACEBAR, ESC } = Phaser.Keyboard;
@@ -5,9 +8,9 @@ class MenuState {
     this.handleDirectoryChoice = this.handleDirectoryChoice.bind(this);
     this.performAction = this.performAction.bind(this);
 
-    this.titleText = this.createText('Hill Fill Phil', 200, 48);
-    this.startText = this.createText('Start', 300);
-    this.exitText = this.createText('Exit', 340);
+    this.titleText = this.createText('Hill Fill Phil', this.world.height / 4, 4);
+    this.startText = this.createText('Start', (this.world.height / 4) * 3);
+    this.exitText = this.createText('Exit', (this.world.height / 4) * 3 + unit);
 
     this.items = [
       {
@@ -37,9 +40,9 @@ class MenuState {
     window.picker.removeEventListener('change', this.handleDirectoryChoice);
   }
 
-  createText(chars, y, size) {
+  createText(chars, y, fontSizeIndex) {
     const text = this.add.text(this.world.width / 2, y, chars.toUpperCase(), {
-      font: `${size || 24}px Arial`,
+      font: font(fontSizeIndex),
       fill: '#fff',
       stroke: '#fff',
       strokeThickness: 0

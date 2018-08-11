@@ -1,6 +1,13 @@
+const unit = 16;
+
 module.exports = {
-  width: 640,
-  height: 480,
+  unit,
+  width: 20 * unit,
+  height: 15 * unit,
+  scaleFactor: 3,
+  fontFamily: 'monospace',
+  fontSizes: [Math.round(unit / 2), Math.round((unit / 3) * 2), unit, Math.round((unit / 2) * 3), unit * 2],
+  fontWeight: 'bold',
   phils: [
     '',
     'ander',
@@ -8,7 +15,7 @@ module.exports = {
     'antha',
     'art',
     'berta',
-    'emon',
+    'émon',
     'etus',
     'ine',
     'ip',

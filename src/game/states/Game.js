@@ -1,13 +1,6 @@
 const { ipcRenderer } = require('electron');
-const humanFormat = require('human-format');
-
-const scale = new humanFormat.Scale({
-  b: 1,
-  k: 1024,
-  M: 1024 * 1024,
-  G: 1024 * 1024 * 1024,
-  T: 1024 * 1024 * 1024 * 1024
-});
+const { fontSizes } = require('../../constants');
+const { fileSize, font } = require('../../utils');
 
 class GameState {
   init() {
@@ -23,11 +16,11 @@ class GameState {
     this.size = 0;
     this.targetSize = 1024 * 100;
 
-    this.sizeText = this.add.text(this.world.width / 2, this.world.height / 2 - 20, '...', {
-      font: '48px Arial',
+    this.sizeText = this.add.text(this.world.width / 2, this.world.height / 2 - fontSizes[4], '...', {
+      font: font(4),
       fill: '#000',
       stroke: '#fff',
-      strokeThickness: 4
+      strokeThickness: 2
     });
     this.sizeText.autoRound = false;
     this.sizeText.smoothed = false;
@@ -35,10 +28,10 @@ class GameState {
 
     this.targetSizeText = this.add.text(
       this.world.width / 2,
-      this.world.height / 2 + 40,
-      `/ ${humanFormat(this.targetSize, { scale })}`,
+      this.world.height / 2 + fontSizes[3],
+      `/ ${fileSize(this.targetSize)}`,
       {
-        font: '24px Arial',
+        font: font(3),
         fill: '#fff',
         stroke: '#000',
         strokeThickness: 0
@@ -57,10 +50,6 @@ class GameState {
 
   update() {
     if (this.size >= this.targetSize) {
-      ipcRenderer.removeAllListeners('measurement');
-      clearTimeout(this.nextMeasurement);
-      this.targetSizeText.text = '👏';
-
       setTimeout(() => {
         this.state.start('menu');
       }, 2000);
@@ -76,9 +65,14 @@ class GameState {
     ipcRenderer.send('measure', this.game.directoryToMeasure);
   }
 
-  handleMeasurement(event, size) {
+  handleMeasurement(_, size) {
     this.size = size;
-    this.sizeText.text = humanFormat(this.size, { scale });
+    this.sizeText.text = fileSize(this.size);
+
+    if (this.size >= this.targetSize) {
+      this.targetSizeText.text = '👏';
+    }
+
     this.nextMeasurement = setTimeout(this.requestMeasurement, 100);
   }
 }

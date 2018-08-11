@@ -3,14 +3,14 @@ const url = require('url');
 const getFolderSize = require('get-folder-size');
 const electron = require('electron');
 const { app, BrowserWindow, ipcMain } = electron;
-const { width, height } = require('./constants');
+const { width, height, scaleFactor } = require('./constants');
 
 let mainWindow;
 
 app.on('ready', () => {
   mainWindow = new BrowserWindow({
-    width,
-    height,
+    width: width * scaleFactor,
+    height: height * scaleFactor,
     frame: false,
     backgroundColor: '#000',
     resizable: false,
