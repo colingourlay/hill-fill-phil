@@ -8,7 +8,7 @@ module.exports = {
   unitsHigh,
   width: unit * unitsWide,
   height: unit * unitsHigh,
-  scaleFactor: 3,
+  scaleFactor: 2,
   fontFamily: 'monospace',
   fontSizes: [Math.round(unit / 2), Math.round((unit / 3) * 2), unit, Math.round((unit / 2) * 3), unit * 2],
   fontWeight: 'bold',

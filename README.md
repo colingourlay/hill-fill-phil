@@ -1,6 +1,8 @@
 # Hill Fill Phil
 
-Get Phil up the hill, by filling your hard drive
+Get Phil up the hill, by filling your hard drive.
+
+Made over 72 hours for Ludum Dare 42.
 
 ## Develop
 
