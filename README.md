@@ -2,7 +2,7 @@
 
 Get Phil up the hill, by filling your hard drive.
 
-Made over 72 hours for Ludum Dare 42.
+Made over 72 hours (mostly at CampJS IX) for Ludum Dare 42.
 
 ## Develop
 
@@ -23,10 +23,7 @@ npm run dist -- -l # Linux
 
 - Colin Gourlay - [@collypops](https://twitter.com/collypops)
 
-Tiles from [Open Game Art](https://opengameart.org/content/simple-broad-purpose-tileset)
-
 ## Thanks
 
 - Nathan Hoad - [@nathanhoad](https://twitter.com/nathanhoad)
 - Lilly Piri - [@lillypiri](https://twitter.com/lillypiri)
-- [surt](https://opengameart.org/users/surt)
