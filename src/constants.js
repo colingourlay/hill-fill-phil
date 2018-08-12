@@ -1,14 +1,18 @@
 const unit = 16;
+const unitsWide = 15;
+const unitsHigh = 15;
 
 module.exports = {
   unit,
-  width: 20 * unit,
-  height: 15 * unit,
-  scaleFactor: 3,
+  unitsWide,
+  unitsHigh,
+  width: unit * unitsWide,
+  height: unit * unitsHigh,
+  scaleFactor: 2,
   fontFamily: 'monospace',
   fontSizes: [Math.round(unit / 2), Math.round((unit / 3) * 2), unit, Math.round((unit / 2) * 3), unit * 2],
   fontWeight: 'bold',
-  phils: [
+  names: [
     '',
     'ander',
     'andros',
