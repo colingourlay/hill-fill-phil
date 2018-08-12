@@ -26,16 +26,13 @@ const INITIAL_CHALLENGE_TYPES = [
   CHALLENGE_TYPES.RISER
 ];
 
+const ADVANCE_INTERVAL = 500;
+
 const getChallengeTiles = (challenge, isCurrentChallenge, level, waterLevel, isRising) => {
   const midIndex = Math.floor(unitsHigh / 2);
-  const risingOffset = isRising ? -1 : 0;
+  const risingOffset = isRising ? 1 : 0;
   const levelOffset = midIndex - challenge.altitude + level - risingOffset;
   const waterLevelOffset = levelOffset + (challenge.altitude - waterLevel);
-
-  console.log(
-    `isRising: ${isRising}, level: ${level}, waterLevel: ${waterLevel},
-risingOffset: ${risingOffset}, levelOffset: ${levelOffset}, waterLevelOffset: ${waterLevelOffset}`
-  );
 
   const tiles = [...new Array(unitsHigh)].map((x, index) => {
     let tile = ' ';
@@ -113,6 +110,23 @@ class HillState {
       this.challenges.push(createChallenge(this.challenges[this.challenges.length - 1], type));
     });
 
+    this.cells = [];
+
+    for (let y = 0; y < unitsWide; y++) {
+      for (let x = 0; x < unitsHigh; x++) {
+        const cell = this.add.sprite(x * unit, y * unit, 'hill');
+
+        cell.animations.add('#', [0]);
+        cell.animations.add('-', [1]);
+        cell.animations.add('0', [2]);
+        cell.animations.add('8', [3]);
+        cell.animations.add('^', [4]);
+        cell.animations.add(' ', [5]);
+
+        this.cells.push(cell);
+      }
+    }
+
     this.isPlaying = true;
     this.distance = 0;
     this.level = 0;
@@ -156,13 +170,22 @@ class HillState {
     this.targetSizeText.smoothed = false;
     this.targetSizeText.anchor.set(1, 0.5);
 
+    this.phil = this.add.text(this.world.width / 2, this.world.height / 2, '👤', {
+      font: font(2),
+      fill: '#000',
+      strokeThickness: 0
+    });
+    this.phil.autoRound = false;
+    this.phil.smoothed = false;
+    this.phil.anchor.set(0.5);
+
     this.input.keyboard.addKeyCapture([ESC]);
     this.input.keyboard.addKey(ESC).onDown.add(window.close);
 
     ipcRenderer.on('measurement', this.handleMeasurement);
     this.requestMeasurement();
 
-    this.nextAdvancmentAttempt = setInterval(this.attemptToAdvance, 500);
+    this.nextAdvancmentAttempt = setInterval(this.attemptToAdvance, ADVANCE_INTERVAL);
   }
 
   update() {
@@ -199,15 +222,17 @@ class HillState {
     );
 
     let map = '';
+    const cellAnimationNames = [];
 
     for (let y = 0; y < unitsWide; y++) {
       for (let x = 0; x < unitsHigh; x++) {
         map += String(tiles[x * unitsHigh + y]);
+        this.cells[x + y * unitsHigh].animations.play(tiles[x * unitsHigh + y]);
       }
       map += '\n';
     }
 
-    console.log(map);
+    // console.log(map);
   }
 
   shutdown() {
@@ -244,13 +269,13 @@ class HillState {
 
     if (nextChallenge.type === CHALLENGE_TYPES.RISER) {
       this.isRising = true;
+      this.level++;
+      this.targetSize = getTargetSizeForLevel(this.level);
 
       setTimeout(() => {
-        this.level++;
-        this.targetSize = getTargetSizeForLevel(this.level);
         this.isRising = false;
         this._update();
-      }, 250);
+      }, ADVANCE_INTERVAL / 2);
     }
 
     if (this.challenges.length < this.distance + Math.ceil(unitsWide / 2)) {

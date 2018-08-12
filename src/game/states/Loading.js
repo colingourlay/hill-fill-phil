@@ -7,12 +7,14 @@ class LoadingState {
     this.game.renderer.renderSession.roundPixels = true;
 
     Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
+
+    this.load.spritesheet('hill', 'game/assets/hill.png', 16, 16, 6);
   }
 
   create() {
-    // this.game.state.start('menu');
+    this.game.state.start('menu');
     // debug
-    this.game.state.start('hill');
+    // this.game.state.start('hill');
   }
 }
 
