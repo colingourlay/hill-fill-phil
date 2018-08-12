@@ -10,7 +10,9 @@ class LoadingState {
   }
 
   create() {
-    this.game.state.start('menu');
+    // this.game.state.start('menu');
+    // debug
+    this.game.state.start('hill');
   }
 }
 

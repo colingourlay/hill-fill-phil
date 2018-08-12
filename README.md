@@ -21,7 +21,10 @@ npm run dist -- -l # Linux
 
 - Colin Gourlay - [@collypops](https://twitter.com/collypops)
 
+Tiles from [Open Game Art](https://opengameart.org/content/simple-broad-purpose-tileset)
+
 ## Thanks
 
 - Nathan Hoad - [@nathanhoad](https://twitter.com/nathanhoad)
 - Lilly Piri - [@lillypiri](https://twitter.com/lillypiri)
+- [surt](https://opengameart.org/users/surt)
