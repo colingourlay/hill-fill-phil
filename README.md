@@ -2,7 +2,7 @@
 
 Get Phil up the hill, by filling your hard drive.
 
-Made over 48 hours at CampJS IX for Ludum Dare 42.
+Made over 72 hours (mostly at CampJS IX) for Ludum Dare 42.
 
 ## Develop
 
