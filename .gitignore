@@ -2,4 +2,5 @@
 node_modules
 /design
 /dist
+/measured
 *.p12

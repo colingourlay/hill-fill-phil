@@ -9,6 +9,6 @@ const humanFormatScale = new humanFormat.Scale({
   T: 1024 * 1024 * 1024 * 1024
 });
 
-module.exports.fileSize = bytes => humanFormat(bytes, { scale: humanFormatScale });
+module.exports.fileSize = bytes => humanFormat(bytes, { scale: humanFormatScale }).replace(/\.\d+/, '');
 
 module.exports.font = fontSize => `${fontWeight} ${fontSizes[fontSize || 2]}px ${fontFamily}`;
