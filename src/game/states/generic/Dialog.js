@@ -3,17 +3,17 @@ const { font } = require('../../../utils');
 
 class DialogState {
   create() {
-    const { UP, DOWN, ENTER, SPACEBAR, ESC } = Phaser.Keyboard;
+    const { UP, DOWN, LEFT, RIGHT, ENTER, SPACEBAR, ESC } = Phaser.Keyboard;
 
     this.game.stage.backgroundColor = '#000';
 
-    this.activeActionIndex = 0;
+    this.activeActionIndex = this.initialActionIndex || 0;
 
     [...this.actions].reverse().forEach((action, index) => {
       const [x, y, xAnchor] =
         this.actions.length > 2
           ? [this.world.width / 2, this.world.height - unit - unit * index, 0.5]
-          : [index === 1 ? this.world.width - unit : unit, this.world.height - unit, index === 1 ? 1 : 0];
+          : [index === 0 ? this.world.width - unit : unit, this.world.height - unit, index === 0 ? 1 : 0];
       action.text = this.add.text(x, y, action.label, {
         font: font(2),
         fill: '#fff',
@@ -26,9 +26,11 @@ class DialogState {
       action.text.anchor.set(xAnchor, 1);
     });
 
-    this.input.keyboard.addKeyCapture([UP, DOWN, ENTER, SPACEBAR, ESC]);
+    this.input.keyboard.addKeyCapture([UP, DOWN, LEFT, RIGHT, ENTER, SPACEBAR, ESC]);
     this.onKeyDown(UP, () => this.updateActiveAction(true));
+    this.onKeyDown(LEFT, () => this.updateActiveAction(true));
     this.onKeyDown(DOWN, () => this.updateActiveAction());
+    this.onKeyDown(RIGHT, () => this.updateActiveAction());
     this.onKeyDown(ENTER, () => this.performActiveAction());
     this.onKeyDown(SPACEBAR, () => this.performActiveAction());
     this.onKeyDown(ESC, window.close);

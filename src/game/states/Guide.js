@@ -54,10 +54,15 @@ class GuideState extends DialogState {
   constructor() {
     super();
 
+    this.initialActionIndex = 1;
     this.actions = [
       {
-        label: '...',
-        method: 'step'
+        label: '⬅',
+        method: 'backwards'
+      },
+      {
+        label: '➡',
+        method: 'forwards'
       }
     ];
   }
@@ -72,18 +77,29 @@ class GuideState extends DialogState {
     this.lines = [...new Array(9)].map((_, index) => this.createText('', unit, unit * 3 + unit * index));
 
     this.pageIndex = -1;
-    this.step();
+    this.step(1);
   }
 
-  step() {
-    const nextPage = PAGES[++this.pageIndex];
-
-    if (!nextPage) {
+  backwards() {
+    if (this.pageIndex === 0) {
       return this.game.state.start('menu');
     }
 
+    this.step(-1);
+  }
+
+  forwards() {
+    if (this.pageIndex + 1 === PAGES.length) {
+      return this.game.state.start('menu');
+    }
+
+    this.step(1);
+  }
+
+  step(diff) {
+    this.pageIndex += diff;
     this.progress.text = `${this.pageIndex + 1}/${PAGES.length}`;
-    this.lines.forEach((line, index) => (line.text = nextPage[index] || ''));
+    this.lines.forEach((line, index) => (line.text = PAGES[this.pageIndex][index] || ''));
   }
 
   createText(chars, x, y, fill) {
