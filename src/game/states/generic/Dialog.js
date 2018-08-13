@@ -10,7 +10,11 @@ class DialogState {
     this.activeActionIndex = 0;
 
     [...this.actions].reverse().forEach((action, index) => {
-      action.text = this.add.text(this.world.width / 2, this.world.height - unit - unit * index, action.label, {
+      const [x, y, xAnchor] =
+        this.actions.length > 2
+          ? [this.world.width / 2, this.world.height - unit - unit * index, 0.5]
+          : [index === 1 ? this.world.width - unit : unit, this.world.height - unit, index === 1 ? 1 : 0];
+      action.text = this.add.text(x, y, action.label, {
         font: font(2),
         fill: '#fff',
         stroke: '#ff0',
@@ -19,7 +23,7 @@ class DialogState {
 
       action.text.autoRound = false;
       action.text.smoothed = false;
-      action.text.anchor.set(0.5);
+      action.text.anchor.set(xAnchor, 1);
     });
 
     this.input.keyboard.addKeyCapture([UP, DOWN, ENTER, SPACEBAR, ESC]);
@@ -60,7 +64,7 @@ class DialogState {
     const action = this.actions[this.activeActionIndex];
 
     if (action.state) {
-      this.game.state.start(state);
+      this.game.state.start(action.state);
     } else if (action.method) {
       this[action.method]();
     }
