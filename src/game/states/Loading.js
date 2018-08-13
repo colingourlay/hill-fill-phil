@@ -8,13 +8,11 @@ class LoadingState {
 
     Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
 
-    this.load.spritesheet('hill', 'game/assets/hill.png', 16, 16, 6);
+    this.load.spritesheet('hill', 'game/assets/hill.png', 16, 16, 7);
   }
 
   create() {
     this.game.state.start('menu');
-    // debug
-    // this.game.state.start('hill');
   }
 }
 

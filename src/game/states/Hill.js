@@ -39,22 +39,33 @@ const getChallengeTiles = (challenge, isCurrentChallenge, level, waterLevel, isR
 
     switch (challenge.type) {
       case CHALLENGE_TYPES.PLAIN:
-        tile = index > levelOffset ? '#' : index > waterLevelOffset ? '-' : index === waterLevelOffset ? '0' : ' ';
+        tile =
+          index === levelOffset + 1
+            ? '='
+            : +index > levelOffset
+              ? '#'
+              : index > waterLevelOffset
+                ? '-'
+                : index === waterLevelOffset
+                  ? '0'
+                  : ' ';
         break;
       case CHALLENGE_TYPES.CHASM:
         tile = index === waterLevelOffset ? '8' : index > waterLevelOffset ? '-' : ' ';
         break;
       case CHALLENGE_TYPES.RISER:
         tile =
-          index > levelOffset + 1
-            ? '#'
-            : index > levelOffset
-              ? '^'
-              : index > waterLevelOffset
-                ? '-'
-                : index === waterLevelOffset
-                  ? '0'
-                  : ' ';
+          index === levelOffset + 2
+            ? '='
+            : index > levelOffset + 1
+              ? '#'
+              : index > levelOffset
+                ? '^'
+                : index > waterLevelOffset
+                  ? '-'
+                  : index === waterLevelOffset
+                    ? '0'
+                    : ' ';
         break;
       default:
         break;
@@ -103,7 +114,7 @@ class HillState {
       this.game.directoryToMeasure = 'C:\\Users\\colin\\code\\hill-fill-phil\\measured';
     }
 
-    this.game.stage.backgroundColor = '#0ff';
+    this.game.stage.backgroundColor = '#699';
 
     this.challenges = [];
     INITIAL_CHALLENGE_TYPES.forEach(type => {
@@ -116,12 +127,13 @@ class HillState {
       for (let x = 0; x < unitsHigh; x++) {
         const cell = this.add.sprite(x * unit, y * unit, 'hill');
 
-        cell.animations.add('#', [0]);
-        cell.animations.add('-', [1]);
-        cell.animations.add('0', [2]);
-        cell.animations.add('8', [3]);
-        cell.animations.add('^', [4]);
-        cell.animations.add(' ', [5]);
+        cell.animations.add('=', [0]);
+        cell.animations.add('#', [1]);
+        cell.animations.add('-', [2]);
+        cell.animations.add('0', [3]);
+        cell.animations.add('8', [4]);
+        cell.animations.add('^', [5]);
+        cell.animations.add(' ', [6]);
 
         this.cells.push(cell);
       }
@@ -135,7 +147,7 @@ class HillState {
     this.waterLevel = getWaterLevelForSize(this.size);
 
     this.sizeIcon = this.add.text(unit / 2, (unit / 2) * 3, '📁', {
-      font: font(3),
+      font: font(2),
       fill: '#000',
       strokeThickness: 0
     });
@@ -143,7 +155,7 @@ class HillState {
     this.sizeIcon.smoothed = false;
     this.sizeIcon.anchor.set(0, 0.5);
 
-    this.sizeText = this.add.text(unit * 3, (unit / 2) * 3, '', {
+    this.sizeText = this.add.text((unit * 5) / 2, (unit / 2) * 3, '', {
       font: font(2),
       fill: '#000',
       strokeThickness: 0
@@ -153,7 +165,7 @@ class HillState {
     this.sizeText.anchor.set(0, 0.5);
 
     this.targetSizeIcon = this.add.text(this.world.width - unit / 2, (unit / 2) * 3, '🎯', {
-      font: font(3),
+      font: font(2),
       fill: '#000',
       strokeThickness: 0
     });
@@ -161,7 +173,7 @@ class HillState {
     this.targetSizeIcon.smoothed = false;
     this.targetSizeIcon.anchor.set(1, 0.5);
 
-    this.targetSizeText = this.add.text(this.world.width - unit * 3, (unit / 2) * 3, '', {
+    this.targetSizeText = this.add.text(this.world.width - (unit * 5) / 2, (unit / 2) * 3, '', {
       font: font(2),
       fill: '#000',
       strokeThickness: 0
@@ -186,6 +198,7 @@ class HillState {
     this.requestMeasurement();
 
     this.nextAdvancmentAttempt = setInterval(this.attemptToAdvance, ADVANCE_INTERVAL);
+    this.attemptToAdvance();
   }
 
   update() {
