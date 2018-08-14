@@ -28,11 +28,21 @@ const INITIAL_CHALLENGE_TYPES = [
 
 const ADVANCE_INTERVAL = 500;
 
-const getChallengeTiles = (challenge, isCurrentChallenge, level, waterLevel, isRising) => {
+const charsTiles = {
+  ground: '=',
+  underground: '#',
+  water: '^',
+  underwater: '~',
+  raft: '8',
+  riser: '+',
+  empty: ' '
+};
+
+const getChallengeTiles = (challenge, level, crossingLevel, isRising) => {
   const midIndex = Math.floor(unitsHigh / 2);
   const risingOffset = isRising ? 1 : 0;
   const levelOffset = midIndex - challenge.altitude + level - risingOffset;
-  const waterLevelOffset = levelOffset + (challenge.altitude - waterLevel);
+  const crossingLevelOffset = levelOffset + (challenge.altitude - crossingLevel);
 
   const tiles = [...new Array(unitsHigh)].map((x, index) => {
     let tile = ' ';
@@ -40,32 +50,32 @@ const getChallengeTiles = (challenge, isCurrentChallenge, level, waterLevel, isR
     switch (challenge.type) {
       case CHALLENGE_TYPES.PLAIN:
         tile =
-          index === levelOffset + 1
-            ? '='
-            : +index > levelOffset
-              ? '#'
-              : index > waterLevelOffset
-                ? '-'
-                : index === waterLevelOffset
-                  ? '0'
-                  : ' ';
+          index > levelOffset + 1
+            ? 'underground'
+            : index === levelOffset + 1
+              ? 'ground'
+              : index > crossingLevelOffset + 1
+                ? 'underwater'
+                : index === crossingLevelOffset + 1
+                  ? 'water'
+                  : 'empty';
         break;
       case CHALLENGE_TYPES.CHASM:
-        tile = index === waterLevelOffset ? '8' : index > waterLevelOffset ? '-' : ' ';
+        tile = index > crossingLevelOffset + 1 ? 'underwater' : index === crossingLevelOffset + 1 ? 'raft' : 'empty';
         break;
       case CHALLENGE_TYPES.RISER:
         tile =
-          index === levelOffset + 2
-            ? '='
-            : index > levelOffset + 1
-              ? '#'
-              : index > levelOffset
-                ? '^'
-                : index > waterLevelOffset
-                  ? '-'
-                  : index === waterLevelOffset
-                    ? '0'
-                    : ' ';
+          index > levelOffset + 2
+            ? 'underground'
+            : index === levelOffset + 2
+              ? 'ground'
+              : index === levelOffset + 1
+                ? 'riser'
+                : index > crossingLevelOffset + 1
+                  ? 'underwater'
+                  : index === crossingLevelOffset + 1
+                    ? 'water'
+                    : 'empty';
         break;
       default:
         break;
@@ -93,9 +103,9 @@ const createChallenge = (previousChallenge, predefinedType) => {
   };
 };
 
-const getTargetSizeForLevel = level => Math.exp(level);
+const getTargetSizeForLevel = level => Math.floor(Math.exp(level - 1));
 
-const getWaterLevelForSize = size => (size ? Math.round(Math.log(size)) : 0) - 1;
+const getCrossingLevelForSize = size => (size ? Math.floor(Math.log(size + 1)) + 1 : 0);
 
 class HillState {
   init() {
@@ -127,13 +137,13 @@ class HillState {
       for (let x = 0; x < unitsHigh; x++) {
         const cell = this.add.sprite(x * unit, y * unit, 'hill');
 
-        cell.animations.add('=', [0]);
-        cell.animations.add('#', [1]);
-        cell.animations.add('-', [2]);
-        cell.animations.add('0', [3]);
-        cell.animations.add('8', [4]);
-        cell.animations.add('^', [5]);
-        cell.animations.add(' ', [6]);
+        cell.animations.add('ground', [0]);
+        cell.animations.add('underground', [1]);
+        cell.animations.add('underwater', [2]);
+        cell.animations.add('water', [3]);
+        cell.animations.add('raft', [4]);
+        cell.animations.add('riser', [5]);
+        cell.animations.add('empty', [6]);
 
         this.cells.push(cell);
       }
@@ -144,7 +154,7 @@ class HillState {
     this.level = 0;
     this.targetSize = getTargetSizeForLevel(this.level);
     this.size = 0;
-    this.waterLevel = getWaterLevelForSize(this.size);
+    this.crossingLevel = getCrossingLevelForSize(this.size);
 
     this.sizeIcon = this.add.text(unit / 2, (unit / 2) * 3, '📁', {
       font: font(2),
@@ -208,17 +218,10 @@ class HillState {
   }
 
   _update() {
+    console.log(this.level, this.targetSize, this.size, this.crossingLevel);
+
     this.sizeText.text = fileSize(this.size);
     this.targetSizeText.text = fileSize(this.targetSize);
-
-    // this.console.log(this.distance, this.level, this.waterLevel, this.hasDrowned);
-
-    if (this.hasDrowned) {
-      this.game.paused = true;
-      return console.log('drowned');
-    }
-
-    const currentChallenge = this.challenges[this.distance];
 
     const challengesToDraw = [...new Array(unitsWide)].map((x, index) => {
       const challengeIndex = index - Math.floor(unitsWide / 2) + this.distance;
@@ -227,25 +230,26 @@ class HillState {
     });
 
     const tiles = challengesToDraw.reduce(
-      (memo, challenge) =>
-        memo.concat(
-          getChallengeTiles(challenge, challenge === currentChallenge, this.level, this.waterLevel, this.isRising)
-        ),
+      (memo, challenge) => memo.concat(getChallengeTiles(challenge, this.level, this.crossingLevel, this.isRising)),
       []
     );
 
-    let map = '';
-    const cellAnimationNames = [];
+    let charsMap = '';
 
     for (let y = 0; y < unitsWide; y++) {
       for (let x = 0; x < unitsHigh; x++) {
-        map += String(tiles[x * unitsHigh + y]);
+        charsMap += charsTiles[tiles[x * unitsHigh + y]];
         this.cells[x + y * unitsHigh].animations.play(tiles[x * unitsHigh + y]);
       }
-      map += '\n';
+      charsMap += '\n';
     }
 
-    // console.log(map);
+    // console.log(charsMap);
+
+    if (this.hasDrowned) {
+      this.game.paused = true;
+      // return console.log('drowned');
+    }
   }
 
   shutdown() {
@@ -261,8 +265,8 @@ class HillState {
   handleMeasurement(_, size) {
     if (size !== this.size) {
       this.size = size;
-      this.waterLevel = getWaterLevelForSize(this.size);
-      this.hasDrowned = this.waterLevel >= this.level;
+      this.crossingLevel = getCrossingLevelForSize(this.size);
+      this.hasDrowned = this.crossingLevel > this.level;
       this._update();
     }
 
@@ -272,9 +276,13 @@ class HillState {
   }
 
   attemptToAdvance() {
+    if (this.hasDrowned) {
+      return this._update();
+    }
+
     const nextChallenge = this.challenges[this.distance + 1];
 
-    if (nextChallenge.type === CHALLENGE_TYPES.CHASM && this.level !== this.waterLevel + 1) {
+    if (nextChallenge.type === CHALLENGE_TYPES.CHASM && this.level !== this.crossingLevel) {
       return;
     }
 
