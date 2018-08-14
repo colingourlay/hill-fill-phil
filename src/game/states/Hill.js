@@ -38,6 +38,8 @@ const charsTiles = {
   empty: ' '
 };
 
+const STARTING_LEVEL = 8; // 1k
+
 const getChallengeTiles = (challenge, level, crossingLevel, isRising) => {
   const midIndex = Math.floor(unitsHigh / 2);
   const risingOffset = isRising ? 1 : 0;
@@ -94,7 +96,8 @@ const createChallenge = (previousChallenge, predefinedType) => {
       ? Math.floor(Math.random() * NUM_CHALLENGE_TYPES)
       : CHALLENGE_TYPES.PLAIN);
   const index = previousChallenge ? previousChallenge.index + 1 : 0;
-  const altitude = (previousChallenge || { altitude: 0 }).altitude + (type === CHALLENGE_TYPES.RISER ? 1 : 0);
+  const altitude =
+    (previousChallenge || { altitude: STARTING_LEVEL }).altitude + (type === CHALLENGE_TYPES.RISER ? 1 : 0);
 
   return {
     type,
@@ -151,10 +154,10 @@ class HillState {
 
     this.isPlaying = true;
     this.distance = 0;
-    this.level = 0;
+    this.level = STARTING_LEVEL;
     this.targetSize = getTargetSizeForLevel(this.level);
     this.size = 0;
-    this.crossingLevel = getCrossingLevelForSize(this.size);
+    this.crossingLevel = Math.max(STARTING_LEVEL, getCrossingLevelForSize(this.size));
 
     this.sizeIcon = this.add.text(unit / 2, (unit / 2) * 3, '📁', {
       font: font(2),
@@ -226,7 +229,7 @@ class HillState {
     const challengesToDraw = [...new Array(unitsWide)].map((x, index) => {
       const challengeIndex = index - Math.floor(unitsWide / 2) + this.distance;
 
-      return this.challenges[challengeIndex] || { type: CHALLENGE_TYPES.PLAIN, index: null, altitude: 0 };
+      return this.challenges[challengeIndex] || { type: CHALLENGE_TYPES.PLAIN, index: null, altitude: STARTING_LEVEL };
     });
 
     const tiles = challengesToDraw.reduce(
@@ -265,7 +268,7 @@ class HillState {
   handleMeasurement(_, size) {
     if (size !== this.size) {
       this.size = size;
-      this.crossingLevel = getCrossingLevelForSize(this.size);
+      this.crossingLevel = Math.max(STARTING_LEVEL, getCrossingLevelForSize(this.size));
       this.hasDrowned = this.crossingLevel > this.level;
       this._update();
     }
